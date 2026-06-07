@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+<meta name="description" content="แอปตารางธาตุสำหรับเรียนรู้และทดสอบความรู้เกี่ยวกับธาตุเคมี">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Periodic Table">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" href="./MyIcon.png">
+<link rel="apple-touch-icon" href="./MyIcon.png">
+<title>ตารางธาตุหมู่ A</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<style>
+  :root {
+    --metal: #3b82f6;
+    --metal-bg: #dbeafe;
+    --metal-text: #1e3a5f;
+    --metalloid: #10b981;
+    --metalloid-bg: #d1fae5;
+    --metalloid-text: #064e3b;
+    --nonmetal: #ef4444;
+    --nonmetal-bg: #fee2e2;
+    --nonmetal-text: #7f1d1d;
+    --noble: #8b5cf6;
+    --noble-bg: #ede9fe;
+    --noble-text: #3b0764;
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #0f172a;
+    --text-sub: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Allow text selection only in modal descriptions (for copying info) */
+  .modal-desc {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  /* ป้องกัน selection highlighting */
+  ::selection { background: transparent; }
+  ::-webkit-selection { background: transparent; }
+  ::-moz-selection { background: transparent; }
+
+  /* ป้องกันการแสดง context menu indicator */
+  img { pointer-events: none; }
+
+  /* HEADER */
+  header {
+    background: #0f172a; color: white;
+    padding: 1rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  }
+  .header-left { display: flex; align-items: center; gap: 0.75rem; }
+  header h1 { font-family: 'Prompt', sans-serif; font-size: 1.2rem; font-weight: 600; }
+  header p { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+
+  /* Group Selector in Header */
+  .group-selector {
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+  }
+  .group-selector-label { font-size: 0.75rem; color: #94a3b8; white-space: nowrap; }
+  .group-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .gpill {
+    padding: 3px 10px; border-radius: 999px; border: 1.5px solid #334155;
+    background: transparent; color: #94a3b8; font-size: 0.72rem; font-family: 'Sarabun', sans-serif;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .gpill:hover { border-color: #64748b; color: #e2e8f0; }
+  .gpill.active { background: #3b82f6; border-color: #3b82f6; color: white; }
+  .gpill.all-pill.active { background: #475569; border-color: #475569; }
+
+  /* Quiz Mode Button */
+  .quiz-mode-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 8px; border: none;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: white; font-family: 'Sarabun', sans-serif; font-size: 0.85rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.4);
+  }
+  .quiz-mode-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.5); }
+  .quiz-mode-btn .material-icons-round { font-size: 18px; }
+
+  /* Legend */
+  .legend {
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
+  }
+  .legend-title { font-size: 0.75rem; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 500; }
+  .leg-swatch { width: 22px; height: 15px; border-radius: 4px; border: 2px solid transparent; }
+  .leg.metal .leg-swatch    { background: var(--metal-bg); border-color: var(--metal); }
+  .leg.metalloid .leg-swatch{ background: var(--metalloid-bg); border-color: var(--metalloid); }
+  .leg.nonmetal .leg-swatch { background: var(--nonmetal-bg); border-color: var(--nonmetal); }
+  .leg.noble .leg-swatch    { background: var(--noble-bg); border-color: var(--noble); }
+  .leg.metal span    { color: var(--metal-text); }
+  .leg.metalloid span{ color: var(--metalloid-text); }
+  .leg.nonmetal span { color: var(--nonmetal-text); }
+  .leg.noble span    { color: var(--noble-text); }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 1.25rem 1.5rem; }
+
+  /* Filter tabs */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+  .filter-btn {
+    padding: 5px 14px; border-radius: 999px; border: 1.5px solid var(--border);
+    background: white; font-family: 'Sarabun', sans-serif; font-size: 0.8rem;
+    font-weight: 500; cursor: pointer; transition: all 0.15s; color: var(--text-sub);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .filter-btn:hover { border-color: #94a3b8; color: var(--text); }
+  .filter-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
+  .filter-btn:active { transform: scale(0.98); }
+  @media (hover: none) {
+    .filter-btn:hover { border-color: #64748b; }
+  }
+  .filter-btn.f-metal.active    { background: var(--metal); border-color: var(--metal); }
+  .filter-btn.f-metalloid.active{ background: var(--metalloid); border-color: var(--metalloid); }
+  .filter-btn.f-nonmetal.active { background: var(--nonmetal); border-color: var(--nonmetal); }
+  .filter-btn.f-noble.active    { background: var(--noble); border-color: var(--noble); }
+  .filter-btn .material-icons-round { font-size: 14px; }
+
+  /* Group section */
+  .group-section { margin-bottom: 1.75rem; }
+  .group-section.hidden { display: none; }
+  .group-header { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+  .group-name { font-family: 'Prompt', sans-serif; font-size: 1rem; font-weight: 600; }
+  .group-desc { font-size: 0.78rem; color: var(--text-sub); }
+
+  /* Element cards */
+  .elements-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .el-card {
+    width: 88px; border-radius: 10px; padding: 8px 6px;
+    border: 2px solid transparent; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative; text-align: center; user-select: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 95px; overflow: hidden; box-sizing: border-box;
+  }
+  .el-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .el-card:active { transform: translateY(-2px) scale(0.98); }
+  @media (hover: none) {
+    /* Touch devices - reduce hover effect */
+    .el-card:hover { transform: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  }
+  .el-card.metal    { background: var(--metal-bg);    border-color: var(--metal);    color: var(--metal-text); }
+  .el-card.metalloid{ background: var(--metalloid-bg);border-color: var(--metalloid);color: var(--metalloid-text); }
+  .el-card.nonmetal { background: var(--nonmetal-bg); border-color: var(--nonmetal); color: var(--nonmetal-text); }
+  .el-card.noble    { background: var(--noble-bg);    border-color: var(--noble);    color: var(--noble-text); }
+  .el-num { 
+    font-size: 9px; opacity: 0.65; position: absolute; top: 3px; left: 5px;
+    max-width: 25px; word-break: break-word; overflow: hidden;
+  }
+  .el-mass { 
+    font-size: 9px; opacity: 0.6; position: absolute; top: 3px; right: 5px;
+    max-width: 25px; word-break: break-word; overflow: hidden;
+  }
+  .el-sym { 
+    font-family: 'Prompt', sans-serif; font-size: 1.5rem; font-weight: 700; 
+    line-height: 1; margin-top: 18px; margin-bottom: 2px;
+    word-break: break-word; width: 100%;
+  }
+  .el-name { 
+    font-size: 8px; opacity: 0.8; line-height: 1.1;
+    word-break: break-word; width: 100%; padding: 0 3px;
+    min-height: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .el-config { 
+    font-size: 7px; opacity: 0.6; font-family: monospace;
+    word-break: break-all; width: 100%; padding: 0 2px;
+    line-height: 1; margin-top: 1px;
+  }
+  .el-card.dimmed { opacity: 0.2; transform: none !important; pointer-events: none; }
+
+  /* ===================== MODAL (Info) ===================== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,23,42,0.3); z-index: 100;
+    align-items: center; justify-content: center; padding: 1rem;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 28px; max-width: 400px; width: 100%;
+    box-shadow: 0 8px 32px rgba(31,38,135,0.15), inset 0 0 0 1px rgba(255,255,255,0.5);
+    overflow: hidden;
+    animation: popInGlass 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(8px);
+  }
+  @keyframes popInGlass { from { transform: scale(0.85) translateY(10px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+  .modal-top { padding: 1.5rem 1.5rem 1.25rem; display: flex; align-items: flex-start; gap: 1rem; background: rgba(255,255,255,0.4); }
+  .modal-badge {
+    width: 68px; height: 68px; border-radius: 18px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 2.5px solid rgba(255,255,255,0.4); 
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(10px);
+  }
+  .modal-badge .b-sym { font-family: 'Prompt', sans-serif; font-size: 1.9rem; font-weight: 700; line-height: 1; }
+  .modal-badge .b-num { font-size: 10px; opacity: 0.7; }
+  .modal-info h2 { font-family: 'Prompt', sans-serif; font-size: 1.15rem; font-weight: 700; color: #0f172a; }
+  .modal-info .type-badge { display: inline-block; margin-top: 5px; padding: 3px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; background: rgba(59,130,246,0.2); color: #1e40af; border: 1px solid rgba(59,130,246,0.3); }
+  .modal-body { padding: 1.5rem 1.5rem 0; background: rgba(255,255,255,0.3); }
+  .modal-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(31,38,135,0.08); font-size: 0.87rem; color: #0f172a; }
+  .modal-row:last-of-type { border: none; }
+  .modal-row .label { color: #64748b; }
+  .modal-row .value { font-weight: 600; text-align: right; font-size: 0.84rem; color: #0f172a; }
+  .modal-desc { margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(15,23,42,0.06); border-radius: 14px; border: 1px solid rgba(15,23,42,0.08); font-size: 0.85rem; line-height: 1.65; color: #0f172a; }
+  .modal-close {
+    width: calc(100% - 3rem); padding: 0.9rem 1.5rem; background: rgba(59,130,246,0.8); color: white;
+    border: none; font-family: 'Prompt', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; margin: 1rem 1.5rem 1.5rem;
+    border-radius: 14px; display: flex; align-items: center; justify-content: center; gap: 6px;
+    backdrop-filter: blur(8px);
+  }
+  .modal-close:hover { background: rgba(59,130,246,0.9); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59,130,246,0.3); }
+
+  /* ===================== QUIZ SCREEN ===================== */
+  #quiz-screen {
+    display: none; position: fixed; inset: 0; background: #0f172a;
+    z-index: 200; flex-direction: column; overflow: hidden;
+  }
+  #quiz-screen.active { display: flex; }
+
+  /* Quiz Setup */
+  #quiz-setup {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex: 1; padding: 2rem; gap: 1.5rem;
+  }
+  .setup-card {
+    background: #1e293b; border-radius: 20px; padding: 2.5rem 2rem;
+    max-width: 480px; width: 100%; box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+  .setup-title {
+    font-family: 'Prompt', sans-serif; font-size: 1.5rem; font-weight: 700;
+    color: white; text-align: center; margin-bottom: 0.3rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  }
+  .setup-title .material-icons-round { font-size: 28px; color: #60a5fa; }
+  .setup-sub { text-align: center; color: #64748b; font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .setup-section-label { font-size: 0.78rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.6rem; }
+
+  /* Mode select */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+  .mode-card {
+    border: 2px solid #334155; border-radius: 12px; padding: 0.9rem 0.75rem;
+    cursor: pointer; transition: all 0.2s; background: #0f172a; text-align: center; color: #94a3b8;
+  }
+  .mode-card:hover { border-color: #475569; color: #cbd5e1; }
+  .mode-card.selected { border-color: #3b82f6; background: #1d3557; color: white; }
+  .mode-card .material-icons-round { font-size: 28px; display: block; margin-bottom: 6px; color: #60a5fa; }
+  .mode-card.selected .material-icons-round { color: #93c5fd; }
+  .mode-card-label { font-size: 0.82rem; font-weight: 600; }
+  .mode-card-desc { font-size: 0.72rem; margin-top: 3px; opacity: 0.7; }
+
+  /* Group select for quiz */
+  .quiz-group-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.5rem; }
+  .qg-btn {
+    padding: 4px 12px; border-radius: 8px; border: 1.5px solid #334155;
+    background: #0f172a; color: #64748b; font-size: 0.78rem; font-family: 'Sarabun', sans-serif;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .qg-btn:hover { border-color: #475569; color: #94a3b8; }
+  .qg-btn.selected { border-color: #3b82f6; background: #1d3557; color: #93c5fd; }
+
+  .setup-btn {
+    width: 100%; padding: 0.9rem; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: white; font-family: 'Prompt', sans-serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.4);
+  }
+  .quiz-home-floating {
+    position: absolute; top: 20px; left: 20px; z-index: 220;
+    padding: 0.85rem 1rem; border-radius: 14px; border: none;
+    background: rgba(15,23,42,0.9); color: white;
+    font-family: 'Sarabun', sans-serif; font-size: 0.88rem; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 8px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+    cursor: pointer; transition: transform 0.18s, background 0.18s;
+  }
+  .quiz-home-floating:hover { background: rgba(15,23,42,1); transform: translateY(-1px); }
+  .quiz-home-floating .material-icons-round { font-size: 18px; }
+  .setup-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,0.5); }
+  .setup-btn .material-icons-round { font-size: 20px; }
+
+  /* Quiz Header */
+  #quiz-header {
+    background: #1e293b; padding: 0.75rem 1.5rem;
+    display: flex; align-items: center; gap: 1rem; flex-shrink: 0;
+    border-bottom: 1px solid #334155;
+  }
+  .quiz-back-btn {
+    display: flex; align-items: center; gap: 4px;
+    background: none; border: none; color: #64748b;
+    cursor: pointer; font-size: 0.82rem; font-family: 'Sarabun', sans-serif;
+    padding: 4px 8px; border-radius: 6px; transition: all 0.15s;
+  }
+  .quiz-back-btn:hover { background: #334155; color: #cbd5e1; }
+  .quiz-back-btn .material-icons-round { font-size: 18px; }
+  .quiz-progress-wrap { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .quiz-progress-text { font-size: 0.78rem; color: #94a3b8; display: flex; justify-content: space-between; }
+  .quiz-progress-bar { height: 5px; background: #334155; border-radius: 999px; overflow: hidden; }
+  .quiz-progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 999px; transition: width 0.4s ease; }
+  .quiz-score-badge {
+    display: flex; align-items: center; gap: 5px;
+    background: #0f172a; padding: 5px 12px; border-radius: 8px;
+    font-size: 0.82rem; color: #94a3b8; white-space: nowrap;
+  }
+  .quiz-score-badge .material-icons-round { font-size: 16px; color: #22c55e; }
+
+  /* Timer */
+  .quiz-timer-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .quiz-timer-ring { position: relative; width: 42px; height: 42px; }
+  .quiz-timer-ring svg { transform: rotate(-90deg); }
+  .quiz-timer-ring circle.bg { fill: none; stroke: #334155; stroke-width: 3; }
+  .quiz-timer-ring circle.fg { fill: none; stroke: #3b82f6; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.9s linear, stroke 0.3s; }
+  .quiz-timer-ring circle.fg.danger { stroke: #ef4444; }
+  .quiz-timer-num {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 700; color: white;
+  }
+
+  /* Quiz Body */
+  #quiz-body {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 1.5rem; overflow-y: auto;
+  }
+  .quiz-card {
+    background: #1e293b; border-radius: 20px; max-width: 560px; width: 100%;
+    padding: 2rem; box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+  }
+  .quiz-mode-label {
+    font-size: 0.72rem; color: #64748b; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 1rem; display: flex; align-items: center; gap: 5px;
+  }
+  .quiz-mode-label .material-icons-round { font-size: 14px; }
+  .quiz-question-el {
+    text-align: center; margin-bottom: 1.5rem;
+  }
+  .qel-badge {
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 90px; height: 90px; border-radius: 16px; border: 3px solid transparent;
+    margin: 0 auto 0.75rem;
+  }
+  .qel-badge .qel-num { font-size: 11px; opacity: 0.6; }
+  .qel-badge .qel-sym { font-family: 'Prompt', sans-serif; font-size: 2.4rem; font-weight: 700; line-height: 1; }
+  .qel-badge .qel-name { font-size: 10px; margin-top: 2px; opacity: 0.8; }
+  .quiz-question-text { font-size: 1.05rem; color: #e2e8f0; font-weight: 600; line-height: 1.5; }
+
+  /* Answer options */
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1.25rem; }
+  .quiz-opt {
+    padding: 0.85rem 1rem; border-radius: 12px;
+    border: 2px solid #334155; background: #0f172a; color: #cbd5e1;
+    font-family: 'Sarabun', sans-serif; font-size: 0.88rem; font-weight: 500;
+    cursor: pointer; transition: all 0.15s; text-align: center; line-height: 1.3;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: #3b82f6; background: #1d3557; color: white; }
+  .quiz-opt:active:not(:disabled) { transform: scale(0.98); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-opt.correct { border-color: #22c55e; background: #14532d; color: #86efac; }
+  .quiz-opt.wrong   { border-color: #ef4444; background: #450a0a; color: #fca5a5; }
+  .quiz-opt.reveal  { border-color: #22c55e; background: #14532d; color: #86efac; opacity: 0.7; }
+  @media (hover: none) {
+    .quiz-opt:hover:not(:disabled) { border-color: #475569; background: #0f172a; color: #cbd5e1; }
+  }
+
+  /* Text input mode */
+  .quiz-input-wrap { display: flex; gap: 10px; margin-top: 1.25rem; }
+  .quiz-input {
+    flex: 1; padding: 0.85rem 1rem; border-radius: 12px;
+    border: 2px solid #334155; background: #0f172a; color: white;
+    font-family: 'Sarabun', sans-serif; font-size: 0.95rem; outline: none;
+    transition: border-color 0.15s;
+  }
+  .quiz-input:focus { border-color: #3b82f6; }
+  .quiz-input.correct { border-color: #22c55e; background: #14532d; }
+  .quiz-input.wrong   { border-color: #ef4444; background: #450a0a; }
+  .quiz-submit-btn {
+    padding: 0.85rem 1.25rem; border-radius: 12px; border: none;
+    background: #3b82f6; color: white; font-family: 'Sarabun', sans-serif;
+    font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .quiz-submit-btn:hover { background: #2563eb; }
+  .quiz-submit-btn .material-icons-round { font-size: 18px; }
+
+  /* Feedback */
+  .quiz-feedback {
+    display: none; margin-top: 1rem; padding: 0.85rem 1rem; border-radius: 12px;
+    font-size: 0.88rem; line-height: 1.5; border: 2px solid transparent;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { border-color: #22c55e; background: #052e16; color: #86efac; }
+  .quiz-feedback.wrong   { border-color: #ef4444; background: #1c0606; color: #fca5a5; }
+  .quiz-feedback-head { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+  .quiz-feedback-head .material-icons-round { font-size: 18px; }
+
+  /* Next btn */
+  .quiz-next-btn {
+    display: none; width: 100%; margin-top: 1rem;
+    padding: 0.9rem; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: white; font-family: 'Prompt', sans-serif; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; text-align: center;
+    display: none; align-items: center; justify-content: center; gap: 6px;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+  }
+  .quiz-next-btn.show { display: flex; }
+  .quiz-next-btn:hover { transform: translateY(-1px); }
+  .quiz-next-btn .material-icons-round { font-size: 20px; }
+
+  /* ===================== RESULT POPUP ===================== */
+  .result-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); z-index: 300;
+    align-items: center; justify-content: center; padding: 1rem;
+    backdrop-filter: blur(6px);
+  }
+  .result-overlay.open { display: flex; }
+  .result-card {
+    background: #1e293b; border-radius: 24px; max-width: 420px; width: 100%;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6); overflow: hidden;
+    animation: popIn 0.25s ease;
+  }
+  .result-header {
+    padding: 2rem 2rem 1.5rem; text-align: center; position: relative;
+  }
+  .result-icon-wrap {
+    width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 1rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+  }
+  .result-icon-wrap.perfect { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+  .result-icon-wrap.great   { background: linear-gradient(135deg, #22c55e, #16a34a); }
+  .result-icon-wrap.good    { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+  .result-icon-wrap.poor    { background: linear-gradient(135deg, #ef4444, #dc2626); }
+  .result-icon-wrap .material-icons-round { font-size: 40px; color: white; }
+  .result-title { font-family: 'Prompt', sans-serif; font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 0.3rem; }
+  .result-sub { font-size: 0.85rem; color: #64748b; }
+  .result-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 1px solid #334155; border-bottom: 1px solid #334155; }
+  .result-stat { padding: 1.1rem 0.5rem; text-align: center; }
+  .result-stat:not(:last-child) { border-right: 1px solid #334155; }
+  .result-stat-num { font-family: 'Prompt', sans-serif; font-size: 1.8rem; font-weight: 700; color: white; }
+  .result-stat-num.green { color: #22c55e; }
+  .result-stat-num.red   { color: #ef4444; }
+  .result-stat-label { font-size: 0.72rem; color: #64748b; margin-top: 2px; }
+  .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 1.25rem 1.5rem; }
+  .result-btn {
+    padding: 0.85rem; border-radius: 12px; border: none;
+    font-family: 'Sarabun', sans-serif; font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .result-btn.primary { background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; }
+  .result-btn.primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .result-btn.secondary { background: #334155; color: #94a3b8; }
+  .result-btn.secondary:hover { background: #475569; color: #e2e8f0; }
+  .result-btn .material-icons-round { font-size: 18px; }
+
+  /* WELCOME ANIMATION */
+  .welcome-overlay {
+    position: fixed; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; overflow: hidden;
+  }
+  .welcome-container {
+    position: relative; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 2rem; text-align: center; padding: 2rem;
+  }
+
+  /* Atomic structure - Nucleus + Orbits */
+  .welcome-atom {
+    position: relative; width: 180px; height: 180px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nucleus {
+    position: absolute; width: 20px; height: 20px;
+    background: radial-gradient(circle at 30% 30%, #fbbf24, #f59e0b);
+    border-radius: 50%; box-shadow: 0 0 20px rgba(245, 158, 11, 0.8),
+                                   inset -2px -2px 8px rgba(0,0,0,0.3);
+    animation: nucleusPulse 2s ease-in-out infinite;
+  }
+  @keyframes nucleusPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  .orbit {
+    position: absolute; border: 2px solid rgba(59, 130, 246, 0.4);
+    border-radius: 50%; animation: orbitSpin 6s linear infinite;
+  }
+  .orbit:nth-child(1) { width: 80px; height: 80px; animation-duration: 6s; }
+  .orbit:nth-child(2) { width: 120px; height: 120px; animation-duration: 9s; animation-direction: reverse; }
+  .orbit:nth-child(3) { width: 160px; height: 160px; animation-duration: 12s; }
+  @keyframes orbitSpin { to { transform: rotate(360deg); } }
+
+  .electron {
+    position: absolute; width: 8px; height: 8px;
+    background: #3b82f6; border-radius: 50%;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.9);
+  }
+  .orbit:nth-child(1) .electron { top: -4px; animation: orbitSpin 6s linear infinite; }
+  .orbit:nth-child(2) .electron { top: -4px; animation: orbitSpin 9s linear infinite reverse; }
+  .orbit:nth-child(3) .electron { top: -4px; animation: orbitSpin 12s linear infinite; }
+
+  /* Welcome Text Content */
+  .welcome-text {
+    position: relative; z-index: 10; animation: fadeInUp 1s ease 0.5s forwards;
+    opacity: 0;
+  }
+  .welcome-text h1 {
+    font-family: 'Prompt', sans-serif; font-size: 2.5rem; font-weight: 700;
+    color: white; margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .welcome-text p {
+    font-size: 1.1rem; color: #cbd5e1; line-height: 1.6;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Infographic items */
+  .welcome-items {
+    display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;
+    position: relative; z-index: 10; margin-top: 1.5rem;
+  }
+  .welcome-item {
+    display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+    padding: 1rem; border-radius: 12px; background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    min-width: 120px; animation: slideInUp 0.8s ease forwards;
+    opacity: 0;
+  }
+  .welcome-item:nth-child(1) { animation-delay: 1s; }
+  .welcome-item:nth-child(2) { animation-delay: 1.3s; }
+  .welcome-item:nth-child(3) { animation-delay: 1.6s; }
+  .welcome-item .material-icons-round {
+    font-size: 2.5rem; color: #3b82f6;
+  }
+  .welcome-item-label {
+    font-size: 0.85rem; color: #94a3b8; text-align: center;
+  }
+
+  /* Particles background */
+  .particle {
+    position: absolute; border-radius: 50%;
+    animation: particleFloat linear infinite;
+    opacity: 0.6;
+  }
+  @keyframes particleFloat {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.8; }
+    100% { transform: translateY(-100vh) translateX(var(--tx)); opacity: 0; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Fade out animation */
+  .welcome-overlay.fade-out {
+    animation: overlayFadeOut 0.8s ease forwards;
+  }
+  @keyframes overlayFadeOut {
+    to { opacity: 0; visibility: hidden; }
+  }
+
+  /* ======================== MOBILE RESPONSIVE (< 768px) ======================== */
+  @media (max-width: 767px) {
+    /* MAIN LAYOUT */
+    body { font-size: 14px; }
+    .main { padding: 0.75rem; }
+    .legend { padding: 0.5rem 0.75rem; flex-wrap: wrap; }
+    header {
+      padding: 0.65rem 0.75rem; flex-direction: column;
+      gap: 0.75rem; align-items: flex-start;
+    }
+    header h1 { font-size: 1.05rem; }
+    header p { font-size: 0.7rem; }
+
+    /* FILTER BUTTONS - Touch friendly */
+    .filters { gap: 6px; margin-bottom: 1rem; }
+    .filter-btn {
+      padding: 8px 12px; min-height: 44px;
+      font-size: 0.75rem; gap: 4px;
+    }
+    .filter-btn .material-icons-round { font-size: 18px; }
+
+    /* GROUP SELECTOR */
+    .group-selector { display: none; }
+    .group-selector-label { display: none; }
+    .group-pills { display: none; }
+
+    /* ELEMENT CARDS */
+    .el-card {
+      width: 70px; padding: 6px 5px;
+      min-height: 85px;
+    }
+    .el-sym { font-size: 1.35rem; margin-top: 15px; }
+    .el-name { font-size: 7px; min-height: 14px; }
+    .el-config { font-size: 6.5px; }
+    .el-num { font-size: 8px; max-width: 20px; }
+    .el-mass { font-size: 8px; max-width: 20px; }
+
+    /* GROUP SECTION */
+    .group-section { margin-bottom: 1.2rem; }
+    .group-header { margin-bottom: 0.5rem; gap: 0.5rem; }
+    .group-name { font-size: 0.95rem; }
+    .group-desc { font-size: 0.7rem; }
+
+    /* MODAL */
+    .modal {
+      max-width: 90vw; width: 100%;
+      border-radius: 24px; background: rgba(255,255,255,0.85);
+    }
+    .modal-top { padding: 1.2rem 1.2rem 1rem; gap: 0.8rem; background: rgba(255,255,255,0.4); }
+    .modal-badge {
+      width: 60px; height: 60px;
+      border-radius: 14px; background: rgba(255,255,255,0.3);
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+    .modal-badge .b-sym { font-size: 1.7rem; }
+    .modal-body { padding: 1.2rem 1.2rem 0; background: rgba(255,255,255,0.3); }
+    .modal-row { padding: 6px 0; font-size: 0.8rem; color: #0f172a; }
+    .modal-desc { font-size: 0.8rem; padding: 0.6rem 0.9rem; background: rgba(15,23,42,0.06); color: #0f172a; }
+    .modal-info h2 { font-size: 1rem; color: #0f172a; }
+    .modal-close { padding: 0.8rem; font-size: 0.85rem; background: rgba(59,130,246,0.8); width: calc(100% - 2.4rem); margin: 1rem 1.2rem 1.2rem; }
+
+    /* QUIZ SETUP */
+    #quiz-setup { padding: 1.5rem 1rem; gap: 1.2rem; }
+    .setup-card {
+      padding: 1.8rem 1.5rem; border-radius: 16px;
+      max-width: 95vw;
+    }
+    .setup-title { font-size: 1.25rem; }
+    .setup-title .material-icons-round { font-size: 24px; }
+    .setup-sub { font-size: 0.8rem; margin-bottom: 1.2rem; }
+    .mode-grid { gap: 8px; margin-bottom: 1rem; }
+    .mode-card {
+      padding: 0.8rem 0.65rem; font-size: 0.75rem;
+      min-height: 80px; display: flex;
+      flex-direction: column; justify-content: center;
+    }
+    .mode-card .material-icons-round { font-size: 24px; }
+    .mode-card-label { font-size: 0.75rem; }
+    .mode-card-desc { font-size: 0.65rem; }
+
+    /* QUIZ GROUP BUTTONS */
+    .quiz-group-grid { gap: 5px; margin-bottom: 1.2rem; }
+    .qg-btn {
+      padding: 6px 10px; font-size: 0.75rem;
+      min-height: 36px;
+    }
+
+    /* SETUP BUTTON */
+    .setup-btn {
+      padding: 0.85rem; font-size: 0.95rem;
+      min-height: 44px;
+    }
+
+    /* QUIZ HEADER */
+    #quiz-header {
+      padding: 0.6rem 0.75rem;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .quiz-back-btn {
+      min-height: 44px; padding: 6px 8px;
+      font-size: 0.75rem;
+    }
+    .quiz-progress-text { font-size: 0.72rem; }
+    .quiz-score-badge { font-size: 0.75rem; padding: 4px 10px; }
+    .quiz-timer-ring { width: 38px; height: 38px; }
+    .quiz-timer-num { font-size: 0.75rem; }
+
+    /* QUIZ BODY */
+    #quiz-body { padding: 1rem 0.75rem; }
+    .quiz-card {
+      padding: 1.5rem 1.2rem; max-width: 95vw;
+      border-radius: 16px;
+    }
+    .qel-badge {
+      width: 75px; height: 75px;
+      border-radius: 12px;
+    }
+    .qel-badge .qel-sym { font-size: 2rem; }
+    .qel-badge .qel-num { font-size: 10px; }
+    .qel-badge .qel-name { font-size: 9px; }
+    .quiz-question-text { font-size: 0.95rem; }
+    .quiz-options {
+      grid-template-columns: 1fr;
+      gap: 8px; margin-top: 1rem;
+    }
+    .quiz-opt {
+      padding: 0.85rem 1rem; font-size: 0.85rem;
+      min-height: 44px; border-radius: 10px;
+    }
+    .quiz-feedback { font-size: 0.8rem; padding: 0.75rem 0.9rem; }
+
+    /* HOME BUTTON */
+    .quiz-home-floating {
+      padding: 0.75rem 0.85rem; font-size: 0.8rem;
+      top: 15px; left: 15px; border-radius: 10px;
+      gap: 6px;
+    }
+    .quiz-home-floating .material-icons-round { font-size: 16px; }
+
+    /* LEGEND */
+    .legend-title { font-size: 0.7rem; }
+    .leg { font-size: 0.72rem; gap: 4px; }
+    .leg-swatch { width: 18px; height: 13px; }
+
+    /* WELCOME SCREEN */
+    .welcome-text h1 { font-size: 1.8rem; }
+    .welcome-text p { font-size: 0.95rem; }
+    .welcome-atom { width: 140px; height: 140px; }
+    .orbit:nth-child(1) { width: 65px; height: 65px; }
+    .orbit:nth-child(2) { width: 95px; height: 95px; }
+    .orbit:nth-child(3) { width: 125px; height: 125px; }
+    .welcome-items { gap: 1rem; margin-top: 1.2rem; }
+    .welcome-item {
+      padding: 0.8rem; min-width: 100px;
+      border-radius: 10px;
+    }
+    .welcome-item .material-icons-round { font-size: 2rem; }
+    .welcome-item-label { font-size: 0.8rem; }
+  }
+
+  /* ======================== SMALL PHONES (< 480px) ======================== */
+  @media (max-width: 479px) {
+    header { padding: 0.55rem 0.6rem; }
+    header h1 { font-size: 0.95rem; }
+    header p { display: none; }
+
+    .main { padding: 0.6rem; }
+    .legend { padding: 0.4rem 0.6rem; }
+
+    .el-card { width: 65px; padding: 5px 4px; min-height: 80px; }
+    .el-sym { font-size: 1.25rem; margin-top: 12px; }
+    .el-name { font-size: 6.5px; min-height: 13px; }
+    .el-config { font-size: 6px; }
+    .el-num { font-size: 7px; max-width: 18px; }
+    .el-mass { font-size: 7px; max-width: 18px; }
+
+    .filter-btn {
+      padding: 7px 10px; font-size: 0.7rem;
+      gap: 3px;
+    }
+    .filter-btn .material-icons-round { font-size: 16px; }
+
+    .modal { border-radius: 24px; }
+    .modal-top { padding: 1rem; gap: 0.7rem; background: rgba(255,255,255,0.4); }
+    .modal-badge { width: 55px; height: 55px; border-radius: 14px; }
+    .modal-body { padding: 1rem 1rem 0; }
+    .modal-row { font-size: 0.75rem; padding: 5px 0; }
+    .modal-close { width: calc(100% - 2rem); margin: 1rem; }
+
+    .setup-card { padding: 1.5rem 1.2rem; border-radius: 14px; }
+    .setup-title { font-size: 1.1rem; }
+    .setup-title .material-icons-round { font-size: 20px; }
+    .mode-card { padding: 0.7rem 0.6rem; min-height: 70px; }
+    .mode-card .material-icons-round { font-size: 20px; }
+    .mode-card-label { font-size: 0.7rem; }
+
+    .quiz-card { padding: 1.2rem 1rem; border-radius: 14px; }
+    .qel-badge { width: 65px; height: 65px; }
+    .qel-badge .qel-sym { font-size: 1.8rem; }
+    .quiz-question-text { font-size: 0.9rem; line-height: 1.4; }
+    .quiz-opt { padding: 0.8rem 0.9rem; font-size: 0.8rem; }
+
+    #quiz-header { padding: 0.5rem 0.6rem; }
+    .quiz-back-btn { font-size: 0.7rem; gap: 3px; }
+    .quiz-score-badge { font-size: 0.7rem; padding: 3px 8px; }
+
+    .quiz-home-floating {
+      padding: 0.65rem 0.75rem; font-size: 0.75rem;
+      top: 12px; left: 12px;
+    }
+
+    .welcome-text h1 { font-size: 1.5rem; }
+    .welcome-text p { font-size: 0.9rem; }
+    .welcome-atom { width: 120px; height: 120px; }
+    .orbit:nth-child(1) { width: 55px; height: 55px; }
+    .orbit:nth-child(2) { width: 80px; height: 80px; }
+    .orbit:nth-child(3) { width: 105px; height: 105px; }
+  }
+
+  /* ======================== LANDSCAPE ADJUSTMENTS (< 600px height) ======================== */
+  @media (max-height: 600px) {
+    header { padding: 0.5rem 0.75rem; }
+    .setup-card { padding: 1.5rem 1.2rem; }
+    .quiz-card { padding: 1.2rem; }
+    .welcome-atom { width: 100px; height: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- WELCOME ANIMATION SCREEN -->
+<div class="welcome-overlay" id="welcome-overlay">
+  <div class="welcome-container">
+    <!-- Atomic structure -->
+    <div class="welcome-atom">
+      <div class="nucleus"></div>
+      <div class="orbit">
+        <div class="electron"></div>
+      </div>
+      <div class="orbit">
+        <div class="electron"></div>
+      </div>
+      <div class="orbit">
+        <div class="electron"></div>
+      </div>
+    </div>
+
+    <!-- Text content -->
+    <div class="welcome-text">
+      <h1>ยินดีต้อนรับ</h1>
+      <p>สำรวจโลกของธาตุเคมี</p>
+    </div>
+
+    <!-- Infographic items -->
+    <div class="welcome-items">
+      <div class="welcome-item">
+        <span class="material-icons-round">science</span>
+        <span class="welcome-item-label">ค้นหาธาตุ</span>
+      </div>
+      <div class="welcome-item">
+        <span class="material-icons-round">quiz</span>
+        <span class="welcome-item-label">ทดสอบ</span>
+      </div>
+      <div class="welcome-item">
+        <span class="material-icons-round">star</span>
+        <span class="welcome-item-label">เรียนรู้</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating particles -->
+  <div id="particles-container"></div>
+</div>
+
+<!-- TABLE SCREEN -->
+<header>
+  <div class="header-left">
+    <div>
+      <h1>ตารางธาตุหมู่ A</h1>
+      <p>Representative Elements — คลิกธาตุเพื่อดูรายละเอียด</p>
+    </div>
+  </div>
+  <div class="group-selector">
+    <span class="group-selector-label">แสดงหมู่:</span>
+    <div class="group-pills" id="group-pills">
+      <button class="gpill all-pill active" data-group="all">ทั้งหมด</button>
+    </div>
+  </div>
+  <button class="quiz-mode-btn" onclick="openQuiz()">
+    <span class="material-icons-round">quiz</span>
+    ทดสอบ
+  </button>
+</header>
+
+<div class="legend">
+  <span class="legend-title">ประเภท:</span>
+  <div class="leg metal"><div class="leg-swatch"></div><span>โลหะ</span></div>
+  <div class="leg metalloid"><div class="leg-swatch"></div><span>กึ่งโลหะ</span></div>
+  <div class="leg nonmetal"><div class="leg-swatch"></div><span>อโลหะ</span></div>
+  <div class="leg noble"><div class="leg-swatch"></div><span>แก๊สมีสกุล</span></div>
+</div>
+
+<div class="main">
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">
+      <span class="material-icons-round">apps</span> ทั้งหมด
+    </button>
+    <button class="filter-btn f-metal" data-filter="metal">
+      <span class="material-icons-round">water_drop</span> โลหะ
+    </button>
+    <button class="filter-btn f-metalloid" data-filter="metalloid">
+      <span class="material-icons-round">blur_on</span> กึ่งโลหะ
+    </button>
+    <button class="filter-btn f-nonmetal" data-filter="nonmetal">
+      <span class="material-icons-round">air</span> อโลหะ
+    </button>
+    <button class="filter-btn f-noble" data-filter="noble">
+      <span class="material-icons-round">bubble_chart</span> แก๊สมีสกุล
+    </button>
+  </div>
+  <div id="table-container"></div>
+</div>
+
+<!-- Info Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="modal-badge" id="m-badge">
+        <div class="b-num" id="m-num"></div>
+        <div class="b-sym" id="m-sym"></div>
+      </div>
+      <div class="modal-info">
+        <h2 id="m-name"></h2>
+        <div class="type-badge" id="m-type-badge"></div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row"><span class="label">มวลอะตอม</span><span class="value" id="m-mass"></span></div>
+      <div class="modal-row"><span class="label">การจัดเรียงอิเล็กตรอน</span><span class="value" id="m-config"></span></div>
+      <div class="modal-row"><span class="label">หมู่ / คาบ</span><span class="value" id="m-group"></span></div>
+      <div class="modal-row"><span class="label">จุดหลอมเหลว</span><span class="value" id="m-mp"></span></div>
+      <div class="modal-row"><span class="label">จุดเดือด</span><span class="value" id="m-bp"></span></div>
+      <div class="modal-desc" id="m-desc"></div>
+      <button class="modal-close" onclick="closeModal()">
+        <span class="material-icons-round" style="font-size:18px">close</span> ปิด
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== QUIZ SCREEN ===================== -->
+<div id="quiz-screen">
+  <button class="quiz-home-floating" onclick="exitToTable()">
+    <span class="material-icons-round">home</span>
+    หน้าหลัก
+  </button>
+  <!-- Setup -->
+  <div id="quiz-setup">
+    <div class="setup-card">
+      <div class="setup-title">
+        <span class="material-icons-round">science</span>
+        ทดสอบความรู้ธาตุ
+      </div>
+      <p class="setup-sub">เลือกโหมดและหมู่ที่ต้องการฝึก</p>
+
+      <p class="setup-section-label">โหมดคำถาม</p>
+      <div class="mode-grid">
+        <div class="mode-card selected" data-mode="sym2name" onclick="selectMode(this)">
+          <span class="material-icons-round">font_download</span>
+          <div class="mode-card-label">สัญลักษณ์ → ชื่อ</div>
+          <div class="mode-card-desc">ดูสัญลักษณ์ แล้วตอบชื่อ</div>
+        </div>
+        <div class="mode-card" data-mode="name2sym" onclick="selectMode(this)">
+          <span class="material-icons-round">translate</span>
+          <div class="mode-card-label">ชื่อ → สัญลักษณ์</div>
+          <div class="mode-card-desc">ดูชื่อ แล้วตอบสัญลักษณ์</div>
+        </div>
+        <div class="mode-card" data-mode="sym2num" onclick="selectMode(this)">
+          <span class="material-icons-round">tag</span>
+          <div class="mode-card-label">สัญลักษณ์ → เลขอะตอม</div>
+          <div class="mode-card-desc">ดูสัญลักษณ์ แล้วตอบเลขอะตอม</div>
+        </div>
+        <div class="mode-card" data-mode="num2sym" onclick="selectMode(this)">
+          <span class="material-icons-round">numbers</span>
+          <div class="mode-card-label">เลขอะตอม → สัญลักษณ์</div>
+          <div class="mode-card-desc">ดูเลขอะตอม แล้วตอบสัญลักษณ์</div>
+        </div>
+      </div>
+
+      <p class="setup-section-label">เลือกหมู่</p>
+      <div class="quiz-group-grid" id="quiz-group-grid">
+        <button class="qg-btn selected" data-group="all" onclick="selectQGroup(this)">ทั้งหมด</button>
+      </div>
+
+      <button class="setup-btn" onclick="startQuiz()">
+        <span class="material-icons-round">play_arrow</span>
+        เริ่มทดสอบ
+      </button>
+    </div>
+  </div>
+
+  <!-- Active Quiz -->
+  <div id="quiz-active" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+    <div id="quiz-header">
+      <div class="quiz-progress-wrap">
+        <div class="quiz-progress-text">
+          <span id="q-progress-text">ข้อ 1 / 10</span>
+          <span id="q-mode-text"></span>
+        </div>
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="q-prog-fill" style="width:0%"></div></div>
+      </div>
+      <div class="quiz-score-badge">
+        <span class="material-icons-round">check_circle</span>
+        <span id="q-score">0</span>
+      </div>
+      <div class="quiz-timer-wrap">
+        <div class="quiz-timer-ring">
+          <svg width="42" height="42" viewBox="0 0 42 42">
+            <circle class="bg" cx="21" cy="21" r="18"/>
+            <circle class="fg" id="timer-circle" cx="21" cy="21" r="18"
+              stroke-dasharray="113.1" stroke-dashoffset="0"/>
+          </svg>
+          <div class="quiz-timer-num" id="timer-num">7</div>
+        </div>
+      </div>
+    </div>
+    <div id="quiz-body">
+      <div class="quiz-card">
+        <div class="quiz-mode-label" id="q-mode-label">
+          <span class="material-icons-round">help_outline</span>
+          <span id="q-mode-label-text"></span>
+        </div>
+        <div class="quiz-question-el" id="q-el-display"></div>
+        <p class="quiz-question-text" id="q-question-text"></p>
+
+        <!-- MCQ options -->
+        <div class="quiz-options" id="q-options"></div>
+
+        <!-- Text input -->
+        <div class="quiz-input-wrap" id="q-input-wrap" style="display:none">
+          <input class="quiz-input" id="q-input" type="text" placeholder="พิมพ์คำตอบ..." autocomplete="off">
+          <button class="quiz-submit-btn" onclick="submitText()">
+            <span class="material-icons-round">send</span>
+          </button>
+        </div>
+
+        <div class="quiz-feedback" id="q-feedback">
+          <div class="quiz-feedback-head" id="q-feedback-head"></div>
+          <span id="q-feedback-body"></span>
+        </div>
+        <button class="quiz-next-btn" id="q-next-btn" onclick="nextQuestion()">
+          ข้อถัดไป <span class="material-icons-round">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Result Popup -->
+<div class="result-overlay" id="result-overlay">
+  <div class="result-card">
+    <div class="result-header">
+      <div class="result-icon-wrap" id="result-icon-wrap">
+        <span class="material-icons-round" id="result-icon">emoji_events</span>
+      </div>
+      <div class="result-title" id="result-title">ผลการทดสอบ</div>
+      <div class="result-sub" id="result-sub"></div>
+    </div>
+    <div class="result-stats">
+      <div class="result-stat">
+        <div class="result-stat-num green" id="res-correct">0</div>
+        <div class="result-stat-label">ถูก</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-num red" id="res-wrong">0</div>
+        <div class="result-stat-label">ผิด</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-num" id="res-pct" style="color:#60a5fa">0%</div>
+        <div class="result-stat-label">คะแนน</div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="result-btn primary" onclick="restartQuiz()">
+        <span class="material-icons-round">replay</span> เล่นอีกครั้ง
+      </button>
+      <button class="result-btn secondary" onclick="exitToTable()">
+        <span class="material-icons-round">table_chart</span> ออกจากเกม
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================== NATIVE APP BEHAVIOR ========================
+// ปิด context menu (right-click)
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ปิด long-press menu (iOS)
+document.addEventListener('touchstart', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+// ปิด double-tap zoom
+let lastTouchEnd = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+
+// ปิด drag & drop
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('drop', e => e.preventDefault());
+
+// ปิด DevTools (F12, Ctrl+Shift+I, Ctrl+Shift+C)
+document.addEventListener('keydown', e => {
+  if (e.key === 'F12' || 
+      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
+      (e.ctrlKey && e.key === 'Shift' && e.key === 'K')) {
+    e.preventDefault();
+  }
+});
+
+// ======================== WELCOME ANIMATION ========================
+function initializeWelcome() {
+  const welcomeOverlay = document.getElementById('welcome-overlay');
+  const particlesContainer = document.getElementById('particles-container');
+
+  // Generate floating particles
+  function generateParticles() {
+    const particleCount = 15;
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      
+      const size = Math.random() * 4 + 2;
+      const duration = Math.random() * 5 + 6;
+      const delay = Math.random() * 2;
+      const tx = (Math.random() - 0.5) * 200;
+      const startX = Math.random() * window.innerWidth;
+      
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      particle.style.left = startX + 'px';
+      particle.style.bottom = '-10px';
+      particle.style.background = ['#3b82f6', '#8b5cf6', '#06b6d4'][Math.floor(Math.random() * 3)];
+      particle.style.setProperty('--tx', tx + 'px');
+      particle.style.animationDuration = duration + 's';
+      particle.style.animationDelay = delay + 's';
+      
+      particlesContainer.appendChild(particle);
+    }
+  }
+
+  generateParticles();
+
+  // Remove welcome overlay after animation completes
+  const animationDuration = 4500; // 4.5 seconds
+  setTimeout(() => {
+    welcomeOverlay.classList.add('fade-out');
+    setTimeout(() => {
+      welcomeOverlay.style.display = 'none';
+    }, 800);
+  }, animationDuration);
+}
+
+// Initialize welcome on page load
+document.addEventListener('DOMContentLoaded', () => {
+  initializeWelcome();
+});
+
+// ======================== DATA ========================
+const groups = [
+  { id:"1A",    label:"หมู่ 1A",  desc:"โลหะอัลคาไล — ว่องไวมาก ทำปฏิกิริยากับน้ำ", elements:[
+    {sym:"H",  name:"ไฮโดรเจน",    num:1,  type:"nonmetal",  mass:"1.008",  config:"1s¹",              group:"1A / คาบ 1", mp:"-259°C", bp:"-253°C", desc:"แก๊สไม่มีสีและไม่มีกลิ่น เบาที่สุดในธาตุทั้งหมด ไวไฟมาก เป็นพลังงานสะอาดในอนาคต"},
+    {sym:"Li",  name:"ลิเทียม",     num:3,  type:"metal",     mass:"6.941",  config:"[He]2s¹",          group:"1A / คาบ 2", mp:"180°C",  bp:"1342°C", desc:"โลหะอ่อนสีเงิน เบาที่สุดในบรรดาโลหะ ใช้ทำแบตเตอรี่ลิเทียม"},
+    {sym:"Na",  name:"โซเดียม",     num:11, type:"metal",     mass:"22.99",  config:"[Ne]3s¹",          group:"1A / คาบ 3", mp:"98°C",   bp:"883°C",  desc:"โลหะอ่อน ต้องเก็บในน้ำมัน ทำให้น้ำลุกไหม้ได้ เป็นองค์ประกอบในเกลือแกง NaCl"},
+    {sym:"K",   name:"โพแทสเซียม",  num:19, type:"metal",     mass:"39.10",  config:"[Ar]4s¹",          group:"1A / คาบ 4", mp:"63°C",   bp:"759°C",  desc:"โลหะสีเงิน ทำปฏิกิริยากับน้ำรุนแรงจนลุกไหม้ สำคัญต่อระบบประสาท"},
+    {sym:"Rb",  name:"รูบิเดียม",   num:37, type:"metal",     mass:"85.47",  config:"[Kr]5s¹",          group:"1A / คาบ 5", mp:"39°C",   bp:"688°C",  desc:"โลหะอ่อนมาก จุดหลอมเหลวต่ำ ติดไฟในอากาศได้เอง"},
+    {sym:"Cs",  name:"ซีเซียม",     num:55, type:"metal",     mass:"132.9",  config:"[Xe]6s¹",          group:"1A / คาบ 6", mp:"29°C",   bp:"671°C",  desc:"โลหะสีทอง อ่อนมาก จุดหลอมเหลว 28.5°C แทบละลายในอุณหภูมิห้อง"},
+    {sym:"Fr",  name:"แฟรนเซียม",   num:87, type:"metal",     mass:"(223)",  config:"[Rn]7s¹",          group:"1A / คาบ 7", mp:"27°C",   bp:"677°C",  desc:"กัมมันตรังสีสูง พบในธรรมชาติน้อยมาก อายุครึ่งชีวิตเพียง 22 นาที"},
+  ]},
+  { id:"2A",   label:"หมู่ 2A",  desc:"โลหะอัลคาไลน์เอิร์ท — แข็งและหนักกว่าหมู่ 1A", elements:[
+    {sym:"Be",  name:"เบริลเลียม",  num:4,  type:"metal",     mass:"9.012",  config:"[He]2s²",          group:"2A / คาบ 2", mp:"1287°C", bp:"2471°C", desc:"โลหะเบาแต่แข็งมาก ทนความร้อนสูง ใช้ในอุตสาหกรรมอวกาศ มีพิษ"},
+    {sym:"Mg",  name:"แมกนีเซียม",  num:12, type:"metal",     mass:"24.31",  config:"[Ne]3s²",          group:"2A / คาบ 3", mp:"650°C",  bp:"1091°C", desc:"โลหะสีเงิน เผาไหม้ได้แสงสีขาวจ้า จำเป็นต่อการสังเคราะห์แสง"},
+    {sym:"Ca",  name:"แคลเซียม",    num:20, type:"metal",     mass:"40.08",  config:"[Ar]4s²",          group:"2A / คาบ 4", mp:"842°C",  bp:"1484°C", desc:"ธาตุสำคัญที่สุดในกระดูกและฟัน ร่างกายมีแคลเซียมประมาณ 1 กก."},
+    {sym:"Sr",  name:"สทรอนเชียม",  num:38, type:"metal",     mass:"87.62",  config:"[Kr]5s²",          group:"2A / คาบ 5", mp:"777°C",  bp:"1382°C", desc:"ให้เปลวไฟสีแดงสด ใช้ในดอกไม้เพลิง ไอโซโทป Sr-90 เป็นกัมมันตรังสี"},
+    {sym:"Ba",  name:"แบเรียม",     num:56, type:"metal",     mass:"137.3",  config:"[Xe]6s²",          group:"2A / คาบ 6", mp:"727°C",  bp:"1845°C", desc:"ใช้ BaSO₄ ในการตรวจทางเดินอาหาร ให้เปลวไฟสีเหลืองอมเขียว"},
+    {sym:"Ra",  name:"เรเดียม",     num:88, type:"metal",     mass:"(226)",  config:"[Rn]7s²",          group:"2A / คาบ 7", mp:"700°C",  bp:"1737°C", desc:"ค้นพบโดยมาดามกูรี กัมมันตรังสีสูง เคยใช้ทำนาฬิกาเรืองแสง"},
+  ]},
+  { id:"3A",  label:"หมู่ 3A",  desc:"มีทั้งโลหะ กึ่งโลหะ — หลากหลายสมบัติ", elements:[
+    {sym:"B",   name:"โบรอน",       num:5,  type:"metalloid", mass:"10.81",  config:"[He]2s²2p¹",       group:"3A / คาบ 2", mp:"2076°C", bp:"3927°C", desc:"กึ่งโลหะสีดำ แข็งมาก ใช้ทำแก้วโบโรซิลิเกต (Pyrex) และเส้นใย Boron"},
+    {sym:"Al",  name:"อะลูมิเนียม", num:13, type:"metal",     mass:"26.98",  config:"[Ne]3s²3p¹",       group:"3A / คาบ 3", mp:"660°C",  bp:"2519°C", desc:"โลหะที่ผลิตมากที่สุดในโลก เบา นำไฟฟ้าดี ทนการกัดกร่อน"},
+    {sym:"Ga",  name:"แกลเลียม",    num:31, type:"metal",     mass:"69.72",  config:"[Ar]4s²3d¹⁰4p¹",  group:"3A / คาบ 4", mp:"30°C",   bp:"2204°C", desc:"จุดหลอมเหลวเพียง 29.7°C ละลายได้ในมือ! ใช้ทำ LED และวงจรอิเล็กทรอนิกส์"},
+    {sym:"In",  name:"อินเดียม",    num:49, type:"metal",     mass:"114.8",  config:"[Kr]5s²4d¹⁰5p¹",  group:"3A / คาบ 5", mp:"157°C",  bp:"2072°C", desc:"โลหะอ่อนมาก ใช้เคลือบ ITO ในหน้าจอสัมผัสและจอ LCD"},
+    {sym:"Tl",  name:"แทลเลียม",    num:81, type:"metal",     mass:"204.4",  config:"[Xe]6s²4f¹⁴5d¹⁰6p¹", group:"3A / คาบ 6", mp:"304°C", bp:"1473°C", desc:"มีพิษสูงมาก เคยใช้เป็นยาเบื่อหนู ปัจจุบันใช้ในเครื่องมือวัดบางชนิด"},
+  ]},
+  { id:"4A",   label:"หมู่ 4A",  desc:"คาร์บอนเป็นรากฐานสิ่งมีชีวิต — ซิลิกอนยุคดิจิทัล", elements:[
+    {sym:"C",   name:"คาร์บอน",     num:6,  type:"nonmetal",  mass:"12.01",  config:"[He]2s²2p²",       group:"4A / คาบ 2", mp:"3550°C", bp:"4827°C", desc:"พื้นฐานของสิ่งมีชีวิตทุกชนิด มีอัญรูปหลายแบบ: เพชร กราไฟต์ ฟุลเลอรีน"},
+    {sym:"Si",  name:"ซิลิกอน",     num:14, type:"metalloid", mass:"28.09",  config:"[Ne]3s²3p²",       group:"4A / คาบ 3", mp:"1414°C", bp:"3265°C", desc:"สารกึ่งตัวนำที่ใช้ผลิตชิปและแผงวงจร Silicon Valley ตั้งชื่อตามธาตุนี้"},
+    {sym:"Ge",  name:"เจอร์เมเนียม",num:32, type:"metalloid", mass:"72.63",  config:"[Ar]4s²3d¹⁰4p²",  group:"4A / คาบ 4", mp:"938°C",  bp:"2833°C", desc:"กึ่งโลหะ ใช้ทำทรานซิสเตอร์ตัวแรก ปัจจุบันใช้ในเส้นใยแก้ว"},
+    {sym:"Sn",  name:"ดีบุก",       num:50, type:"metal",     mass:"118.7",  config:"[Kr]5s²4d¹⁰5p²",  group:"4A / คาบ 5", mp:"232°C",  bp:"2602°C", desc:"ใช้เคลือบกระป๋องอาหาร ผสมกับตะกั่วทำบัดกรี ใช้ในยุคสัมฤทธิ์"},
+    {sym:"Pb",  name:"ตะกั่ว",      num:82, type:"metal",     mass:"207.2",  config:"[Xe]6s²4f¹⁴5d¹⁰6p²", group:"4A / คาบ 6", mp:"327°C", bp:"1749°C", desc:"โลหะหนัก กันรังสีเอกซ์ได้ดี ใช้แบตเตอรี่รถยนต์ มีพิษสะสม"},
+  ]},
+  { id:"5A",    label:"หมู่ 5A",  desc:"ไนโตรเจนและฟอสฟอรัส จำเป็นต่อชีวิต", elements:[
+    {sym:"N",   name:"ไนโตรเจน",    num:7,  type:"nonmetal",  mass:"14.01",  config:"[He]2s²2p³",       group:"5A / คาบ 2", mp:"-210°C", bp:"-196°C", desc:"78% ของบรรยากาศโลก จำเป็นต่อโปรตีนและ DNA ใช้ในปุ๋ย"},
+    {sym:"P",   name:"ฟอสฟอรัส",    num:15, type:"nonmetal",  mass:"30.97",  config:"[Ne]3s²3p³",       group:"5A / คาบ 3", mp:"44°C",   bp:"280°C",  desc:"จำเป็นต่อกระดูก ฟัน DNA และ ATP มีสองอัญรูปหลัก: ขาวและแดง"},
+    {sym:"As",  name:"สารหนู",      num:33, type:"metalloid", mass:"74.92",  config:"[Ar]4s²3d¹⁰4p³",  group:"5A / คาบ 4", mp:"817°C",  bp:"614°C",  desc:"กึ่งโลหะ มีพิษสูงมาก เคยเป็นยาพิษยุคโบราณ ใช้ในสารกึ่งตัวนำ GaAs"},
+    {sym:"Sb",  name:"พลวง",        num:51, type:"metalloid", mass:"121.8",  config:"[Kr]5s²4d¹⁰5p³",  group:"5A / คาบ 5", mp:"631°C",  bp:"1587°C", desc:"ใช้ผสมกับโลหะอื่นเพิ่มความแข็ง ใช้ทำแบตเตอรี่และสารหน่วงไฟ"},
+    {sym:"Bi",  name:"บิสมัท",      num:83, type:"metal",     mass:"209.0",  config:"[Xe]6s²4f¹⁴5d¹⁰6p³", group:"5A / คาบ 6", mp:"271°C", bp:"1564°C", desc:"โลหะหนักที่ไม่ค่อยมีพิษ ใช้ในยาธาตุ เป็นโลหะแทนตะกั่ว"},
+  ]},
+  { id:"6A",   label:"หมู่ 6A",  desc:"แคลโคเจน — ออกซิเจนจำเป็นต่อการหายใจ", elements:[
+    {sym:"O",   name:"ออกซิเจน",    num:8,  type:"nonmetal",  mass:"16.00",  config:"[He]2s²2p⁴",       group:"6A / คาบ 2", mp:"-218°C", bp:"-183°C", desc:"21% ของบรรยากาศ จำเป็นต่อการหายใจและการเผาไหม้ ทำโอโซน O₃ ป้องกัน UV"},
+    {sym:"S",   name:"กำมะถัน",     num:16, type:"nonmetal",  mass:"32.07",  config:"[Ne]3s²3p⁴",       group:"6A / คาบ 3", mp:"113°C",  bp:"445°C",  desc:"ของแข็งสีเหลือง ใช้ผลิตกรดซัลฟิวริก H₂SO₄ ยาง และดินปืน"},
+    {sym:"Se",  name:"ซีลีเนียม",   num:34, type:"nonmetal",  mass:"78.97",  config:"[Ar]4s²3d¹⁰4p⁴",  group:"6A / คาบ 4", mp:"221°C",  bp:"685°C",  desc:"จำเป็นต่อร่างกายในปริมาณน้อย ใช้ในแผงโซลาร์และโฟโตคัปเปลอร์"},
+    {sym:"Te",  name:"เทลลูเรียม",  num:52, type:"metalloid", mass:"127.6",  config:"[Kr]5s²4d¹⁰5p⁴",  group:"6A / คาบ 5", mp:"450°C",  bp:"988°C",  desc:"กึ่งโลหะ ใช้เพิ่มความแข็งให้ตะกั่ว ใช้ในแผ่นซีดี DVD"},
+    {sym:"Po",  name:"โพโลเนียม",   num:84, type:"metal",     mass:"(209)",  config:"[Xe]6s²4f¹⁴5d¹⁰6p⁴", group:"6A / คาบ 6", mp:"254°C", bp:"962°C",  desc:"กัมมันตรังสีสูงมาก ค้นพบโดยมาดามกูรี ใช้เป็นแหล่งความร้อนในดาวเทียม"},
+  ]},
+  { id:"7A",  label:"หมู่ 7A",  desc:"แฮโลเจน — ว่องไวมาก ทำเกลือได้", elements:[
+    {sym:"F",   name:"ฟลูออรีน",    num:9,  type:"nonmetal",  mass:"19.00",  config:"[He]2s²2p⁵",       group:"7A / คาบ 2", mp:"-220°C", bp:"-188°C", desc:"อโลหะที่ว่องไวและมีค่าอิเล็กโตรเนกาทิวิตีสูงสุด ใช้ในยาสีฟัน เทฟลอน"},
+    {sym:"Cl",  name:"คลอรีน",      num:17, type:"nonmetal",  mass:"35.45",  config:"[Ne]3s²3p⁵",       group:"7A / คาบ 3", mp:"-101°C", bp:"-34°C",  desc:"แก๊สสีเหลืองอมเขียว ใช้ฆ่าเชื้อน้ำประปา ผลิต PVC และยาหลายชนิด"},
+    {sym:"Br",  name:"โบรมีน",      num:35, type:"nonmetal",  mass:"79.90",  config:"[Ar]4s²3d¹⁰4p⁵",  group:"7A / คาบ 4", mp:"-7°C",   bp:"59°C",   desc:"ของเหลวสีน้ำตาลแดง ระเหยง่าย ใช้ในยาเบื่อไฟและกล้องฟิล์ม"},
+    {sym:"I",   name:"ไอโอดีน",     num:53, type:"nonmetal",  mass:"126.9",  config:"[Kr]5s²4d¹⁰5p⁵",  group:"7A / คาบ 5", mp:"114°C",  bp:"184°C",  desc:"ของแข็งสีม่วงดำ ระเหิดได้ จำเป็นต่อฮอร์โมนไทรอยด์ ใช้ฆ่าเชื้อโรค"},
+    {sym:"At",  name:"แอสทาทีน",    num:85, type:"metalloid", mass:"(210)",  config:"[Xe]6s²4f¹⁴5d¹⁰6p⁵", group:"7A / คาบ 6", mp:"302°C", bp:"337°C",  desc:"กัมมันตรังสี หายากมาก อายุครึ่งชีวิตเพียง 8.1 ชั่วโมง"},
+  ]},
+  { id:"8A", label:"หมู่ 8A",  desc:"แก๊สมีสกุล — เสถียร เปลือกนอกเต็มทุกตัว", elements:[
+    {sym:"He",  name:"ฮีเลียม",     num:2,  type:"noble",     mass:"4.003",  config:"1s²",              group:"8A / คาบ 1", mp:"-272°C", bp:"-269°C", desc:"แก๊สมีสกุลที่เบาที่สุด ใช้เติมบอลลูน ระบายความร้อนในเครื่อง MRI"},
+    {sym:"Ne",  name:"นีออน",       num:10, type:"noble",     mass:"20.18",  config:"[He]2s²2p⁶",       group:"8A / คาบ 2", mp:"-249°C", bp:"-246°C", desc:"ให้แสงสีส้มแดงในป้ายนีออน แก๊สที่สกัดจากอากาศ"},
+    {sym:"Ar",  name:"อาร์กอน",     num:18, type:"noble",     mass:"39.95",  config:"[Ne]3s²3p⁶",       group:"8A / คาบ 3", mp:"-189°C", bp:"-186°C", desc:"1% ของบรรยากาศโลก ใช้ในหลอดไฟเพื่อป้องกันไส้หลอดไหม้"},
+    {sym:"Kr",  name:"คริปทอน",     num:36, type:"noble",     mass:"83.80",  config:"[Ar]4s²3d¹⁰4p⁶",  group:"8A / คาบ 4", mp:"-157°C", bp:"-153°C", desc:"ใช้ในหลอดไฟประสิทธิภาพสูง แฟลชถ่ายรูป และเลเซอร์คริปทอน"},
+    {sym:"Xe",  name:"ซีนอน",       num:54, type:"noble",     mass:"131.3",  config:"[Kr]5s²4d¹⁰5p⁶",  group:"8A / คาบ 5", mp:"-112°C", bp:"-108°C", desc:"ใช้ในไฟหน้ารถ HID ไฟสปอตไลต์ และขับดันดาวเทียมไอออน"},
+    {sym:"Rn",  name:"เรดอน",       num:86, type:"noble",     mass:"(222)",  config:"[Xe]6s²4f¹⁴5d¹⁰6p⁶", group:"8A / คาบ 6", mp:"-71°C", bp:"-62°C",  desc:"แก๊สมีสกุลที่หนักที่สุด กัมมันตรังสี ซึมออกจากดินและหิน อันตรายในอาคาร"},
+  ]},
+];
+
+const typeLabel = { metal:"โลหะ", metalloid:"กึ่งโลหะ", nonmetal:"อโลหะ", noble:"แก๊สมีสกุล" };
+const typeColor = {
+  metal:     { bg:"var(--metal-bg)",     border:"var(--metal)",     text:"var(--metal-text)",     badge:"#dbeafe", badgeText:"#1e3a5f" },
+  metalloid: { bg:"var(--metalloid-bg)", border:"var(--metalloid)", text:"var(--metalloid-text)", badge:"#d1fae5", badgeText:"#064e3b" },
+  nonmetal:  { bg:"var(--nonmetal-bg)",  border:"var(--nonmetal)",  text:"var(--nonmetal-text)",  badge:"#fee2e2", badgeText:"#7f1d1d" },
+  noble:     { bg:"var(--noble-bg)",     border:"var(--noble)",     text:"var(--noble-text)",     badge:"#ede9fe", badgeText:"#3b0764" },
+};
+
+// ======================== BUILD TABLE ========================
+const container = document.getElementById("table-container");
+const pillsContainer = document.getElementById("group-pills");
+const quizGroupGrid = document.getElementById("quiz-group-grid");
+
+groups.forEach(g => {
+  // Group pill in header
+  const pill = document.createElement("button");
+  pill.className = "gpill";
+  pill.dataset.group = g.id;
+  pill.textContent = g.label;
+  pill.onclick = () => filterByGroup(g.id, pill);
+  pillsContainer.appendChild(pill);
+
+  // Quiz group button
+  const qgb = document.createElement("button");
+  qgb.className = "qg-btn";
+  qgb.dataset.group = g.id;
+  qgb.textContent = g.label;
+  qgb.onclick = () => selectQGroup(qgb);
+  quizGroupGrid.appendChild(qgb);
+
+  // Section
+  const sec = document.createElement("div");
+  sec.className = "group-section";
+  sec.dataset.group = g.id;
+  const hdr = document.createElement("div");
+  hdr.className = "group-header";
+  hdr.innerHTML = `<span class="group-name">${g.label}</span><span class="group-desc">${g.desc}</span>`;
+  sec.appendChild(hdr);
+  const grid = document.createElement("div");
+  grid.className = "elements-grid";
+  g.elements.forEach(el => {
+    const card = document.createElement("div");
+    card.className = `el-card ${el.type}`;
+    card.dataset.type = el.type;
+    card.innerHTML = `
+      <span class="el-num">${el.num}</span>
+      <span class="el-mass">${el.mass}</span>
+      <div class="el-sym">${el.sym}</div>
+      <div class="el-name">${el.name}</div>
+      <div class="el-config">${el.config}</div>
+    `;
+    card.onclick = () => openModal(el);
+    
+    // Touch-friendly improvements
+    card.addEventListener('touchstart', function() {
+      this.style.transform = 'translateY(-4px) scale(0.98)';
+    }, { passive: true });
+    card.addEventListener('touchend', function() {
+      this.style.transform = '';
+    }, { passive: true });
+    
+    grid.appendChild(card);
+  });
+  sec.appendChild(grid);
+  container.appendChild(sec);
+});
+
+// ======================== FILTER ========================
+let currentType = "all";
+let currentGroup = "all";
+
+function filterByGroup(groupId, pillEl) {
+  currentGroup = groupId;
+  document.querySelectorAll(".gpill").forEach(p => p.classList.remove("active"));
+  if (pillEl) pillEl.classList.add("active");
+  else {
+    const allPill = document.querySelector(`.gpill[data-group="${groupId}"]`);
+    if (allPill) allPill.classList.add("active");
+  }
+  applyFilters();
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.onclick = () => {
+    currentType = btn.dataset.filter;
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    applyFilters();
+  };
+});
+
+document.querySelector('.gpill.all-pill').onclick = function() {
+  filterByGroup("all", this);
+};
+
+function applyFilters() {
+  document.querySelectorAll(".group-section").forEach(sec => {
+    if (currentGroup !== "all" && sec.dataset.group !== currentGroup) {
+      sec.classList.add("hidden");
+    } else {
+      sec.classList.remove("hidden");
+    }
+  });
+  document.querySelectorAll(".el-card").forEach(c => {
+    const typeMatch = currentType === "all" || c.dataset.type === currentType;
+    c.classList.toggle("dimmed", !typeMatch);
+  });
+}
+
+// ======================== MODAL ========================
+function openModal(el) {
+  const c = typeColor[el.type];
+  const badge = document.getElementById("m-badge");
+  badge.style.background = c.badge;
+  badge.style.borderColor = c.border;
+  badge.style.color = c.badgeText;
+  document.getElementById("m-num").textContent = el.num;
+  document.getElementById("m-sym").textContent = el.sym;
+  document.getElementById("m-name").textContent = el.name;
+  const tb = document.getElementById("m-type-badge");
+  tb.textContent = typeLabel[el.type];
+  tb.style.background = c.badge;
+  tb.style.color = c.badgeText;
+  document.getElementById("m-mass").textContent = el.mass;
+  document.getElementById("m-config").textContent = el.config;
+  document.getElementById("m-group").textContent = el.group;
+  document.getElementById("m-mp").textContent = el.mp;
+  document.getElementById("m-bp").textContent = el.bp;
+  document.getElementById("m-desc").textContent = el.desc;
+  document.getElementById("modal").classList.add("open");
+}
+function closeModal() { document.getElementById("modal").classList.remove("open"); }
+document.getElementById("modal").addEventListener("click", e => {
+  if (e.target === document.getElementById("modal")) closeModal();
+});
+
+// Improve touch interactions for mobile
+document.addEventListener('touchmove', function(e) {
+  // Allow scrolling within modal and quiz card
+  const modal = document.getElementById("modal");
+  const quizBody = document.getElementById("quiz-body");
+  if (e.target.closest('.modal') || e.target.closest('#quiz-body')) {
+    // Allow default scrolling
+    return;
+  }
+}, { passive: true });
+
+// ======================== QUIZ SETUP ========================
+let quizMode = "sym2name";
+let quizGroup = "all";
+let quizQuestions = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizWrong = 0;
+let timerInterval = null;
+let timerValue = 7;
+let answered = false;
+const TIMER_DURATION = 7;
+const CIRCUMFERENCE = 113.1;
+
+function openQuiz() {
+  document.getElementById("quiz-screen").classList.add("active");
+  document.getElementById("quiz-setup").style.display = "flex";
+  document.getElementById("quiz-active").style.display = "none";
+}
+
+function selectMode(card) {
+  document.querySelectorAll(".mode-card").forEach(c => c.classList.remove("selected"));
+  card.classList.add("selected");
+  quizMode = card.dataset.mode;
+}
+
+function selectQGroup(btn) {
+  document.querySelectorAll(".qg-btn").forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+  quizGroup = btn.dataset.group;
+}
+
+function getAllElements() {
+  let els = [];
+  groups.forEach(g => {
+    if (quizGroup === "all" || g.id === quizGroup) {
+      els = els.concat(g.elements);
+    }
+  });
+  return els;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  const allEls = getAllElements();
+  if (allEls.length < 4) {
+    alert("ต้องมีธาตุอย่างน้อย 4 ตัว กรุณาเลือกหมู่ที่มีธาตุมากกว่านี้");
+    return;
+  }
+  quizQuestions = shuffle(allEls).slice(0, Math.min(allEls.length, 15));
+  quizIndex = 0; quizScore = 0; quizWrong = 0;
+  document.getElementById("quiz-setup").style.display = "none";
+  document.getElementById("quiz-active").style.display = "flex";
+  document.getElementById("q-score").textContent = "0";
+  renderQuestion();
+}
+
+// ======================== QUIZ LOGIC ========================
+function getModeLabel() {
+  const map = {
+    sym2name: { icon: "font_download", text: "ดูสัญลักษณ์ — ตอบชื่อธาตุ" },
+    name2sym: { icon: "translate",     text: "ดูชื่อธาตุ — ตอบสัญลักษณ์" },
+    sym2num:  { icon: "tag",           text: "ดูสัญลักษณ์ — ตอบเลขอะตอม" },
+    num2sym:  { icon: "numbers",       text: "ดูเลขอะตอม — ตอบสัญลักษณ์" },
+  };
+  return map[quizMode];
+}
+
+function getQuestion(el) {
+  const allEls = getAllElements();
+  // Build wrong choices
+  const others = shuffle(allEls.filter(e => e.sym !== el.sym));
+  const wrongPool = others.slice(0, 3);
+
+  let displayHTML = "";
+  let questionText = "";
+  let correctAnswer = "";
+  let choices = [];
+  const c = typeColor[el.type];
+
+  if (quizMode === "sym2name") {
+    displayHTML = `<div class="qel-badge" style="background:${c.bg};border-color:${c.border};color:${c.text}">
+      <span class="qel-num">${el.num}</span>
+      <span class="qel-sym">${el.sym}</span>
+    </div>`;
+    questionText = "ธาตุนี้มีชื่อว่าอะไร?";
+    correctAnswer = el.name;
+    choices = shuffle([el.name, ...wrongPool.map(e => e.name)]);
+  } else if (quizMode === "name2sym") {
+    displayHTML = `<div style="font-size:1.8rem;font-weight:700;color:#e2e8f0;font-family:'Prompt',sans-serif;margin-bottom:0.5rem">${el.name}</div>
+    <div style="font-size:0.85rem;color:#64748b">${typeLabel[el.type]}</div>`;
+    questionText = "สัญลักษณ์ของธาตุนี้คืออะไร?";
+    correctAnswer = el.sym;
+    choices = shuffle([el.sym, ...wrongPool.map(e => e.sym)]);
+  } else if (quizMode === "sym2num") {
+    displayHTML = `<div class="qel-badge" style="background:${c.bg};border-color:${c.border};color:${c.text}">
+      <span class="qel-sym">${el.sym}</span>
+      <span class="qel-name">${el.name}</span>
+    </div>`;
+    questionText = "เลขอะตอมของธาตุนี้คือเท่าไร?";
+    correctAnswer = String(el.num);
+    choices = shuffle([String(el.num), ...wrongPool.map(e => String(e.num))]);
+  } else if (quizMode === "num2sym") {
+    displayHTML = `<div style="font-size:3rem;font-weight:700;color:#60a5fa;font-family:'Prompt',sans-serif;margin-bottom:0.3rem">${el.num}</div>
+    <div style="font-size:0.85rem;color:#64748b">เลขอะตอม</div>`;
+    questionText = "สัญลักษณ์ของธาตุที่มีเลขอะตอมนี้คืออะไร?";
+    correctAnswer = el.sym;
+    choices = shuffle([el.sym, ...wrongPool.map(e => e.sym)]);
+  }
+
+  return { displayHTML, questionText, correctAnswer, choices };
+}
+
+function renderQuestion() {
+  clearTimer();
+  answered = false;
+
+  const el = quizQuestions[quizIndex];
+  const total = quizQuestions.length;
+  const { displayHTML, questionText, correctAnswer, choices } = getQuestion(el);
+
+  // Update progress
+  document.getElementById("q-progress-text").textContent = `ข้อ ${quizIndex + 1} / ${total}`;
+  document.getElementById("q-prog-fill").style.width = `${(quizIndex / total) * 100}%`;
+  document.getElementById("q-score").textContent = quizScore;
+
+  const ml = getModeLabel();
+  document.querySelector(".quiz-mode-label .material-icons-round").textContent = ml.icon;
+  document.getElementById("q-mode-label-text").textContent = ml.text;
+  document.getElementById("q-mode-text").textContent = el.group ? el.group.split("/")[0].trim() : "";
+
+  document.getElementById("q-el-display").innerHTML = displayHTML;
+  document.getElementById("q-question-text").textContent = questionText;
+
+  // Options
+  const optWrap = document.getElementById("q-options");
+  optWrap.innerHTML = "";
+  optWrap.style.display = "grid";
+  document.getElementById("q-input-wrap").style.display = "none";
+
+  choices.forEach(ch => {
+    const btn = document.createElement("button");
+    btn.className = "quiz-opt";
+    btn.textContent = ch;
+    btn.onclick = () => handleAnswer(ch, correctAnswer, el);
+    optWrap.appendChild(btn);
+  });
+
+  // Reset feedback & next
+  const fb = document.getElementById("q-feedback");
+  fb.className = "quiz-feedback";
+  fb.style.display = "none";
+
+  const nb = document.getElementById("q-next-btn");
+  nb.className = "quiz-next-btn";
+
+  startTimer(correctAnswer, el);
+}
+
+// ======================== TIMER ========================
+function startTimer(correctAnswer, el) {
+  timerValue = TIMER_DURATION;
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    timerValue--;
+    updateTimerDisplay();
+    if (timerValue <= 0) {
+      clearTimer();
+      if (!answered) {
+        timeUp(correctAnswer, el);
+      }
+    }
+  }, 1000);
+}
+
+function clearTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function updateTimerDisplay() {
+  const circle = document.getElementById("timer-circle");
+  const numEl = document.getElementById("timer-num");
+  const offset = CIRCUMFERENCE * (1 - timerValue / TIMER_DURATION);
+  circle.style.strokeDashoffset = offset;
+  numEl.textContent = timerValue;
+  circle.classList.toggle("danger", timerValue <= 3);
+}
+
+function timeUp(correctAnswer, el) {
+  answered = true;
+  quizWrong++;
+
+  // Disable all options
+  document.querySelectorAll(".quiz-opt").forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === correctAnswer) btn.classList.add("reveal");
+  });
+
+  const locationText = el.group ? ` อยู่ที่ ${el.group}` : "";
+  showFeedback(false, `หมดเวลา! คำตอบที่ถูกต้องคือ "${correctAnswer}"${locationText}`);
+  document.getElementById("q-next-btn").classList.add("show");
+}
+
+function handleAnswer(chosen, correctAnswer, el) {
+  if (answered) return;
+  answered = true;
+  clearTimer();
+
+  const correct = chosen === correctAnswer;
+  if (correct) quizScore++; else quizWrong++;
+
+  document.querySelectorAll(".quiz-opt").forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === correctAnswer) btn.classList.add("correct");
+    else if (btn.textContent === chosen && !correct) btn.classList.add("wrong");
+  });
+
+  const locationText = el.group ? ` อยู่ที่ ${el.group}` : "";
+  const msg = correct
+    ? `ถูกต้อง! ${el.name} (${el.sym}) เลขอะตอม ${el.num}${locationText}`
+    : `ผิด! คำตอบที่ถูกต้องคือ "${correctAnswer}"${locationText}`;
+  showFeedback(correct, msg);
+  document.getElementById("q-next-btn").classList.add("show");
+}
+
+function showFeedback(correct, msg) {
+  const fb = document.getElementById("q-feedback");
+  const head = document.getElementById("q-feedback-head");
+  const body = document.getElementById("q-feedback-body");
+  fb.style.display = "block";
+  fb.className = `quiz-feedback show ${correct ? "correct" : "wrong"}`;
+  head.innerHTML = `<span class="material-icons-round">${correct ? "check_circle" : "cancel"}</span> ${correct ? "ถูกต้อง!" : "ผิด!"}`;
+  body.textContent = msg;
+}
+
+function nextQuestion() {
+  quizIndex++;
+  if (quizIndex >= quizQuestions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+// ======================== RESULT ========================
+function showResult() {
+  const total = quizQuestions.length;
+  const pct = Math.round((quizScore / total) * 100);
+  document.getElementById("res-correct").textContent = quizScore;
+  document.getElementById("res-wrong").textContent = quizWrong;
+  document.getElementById("res-pct").textContent = pct + "%";
+
+  const iconWrap = document.getElementById("result-icon-wrap");
+  const iconEl = document.getElementById("result-icon");
+  const title = document.getElementById("result-title");
+  const sub = document.getElementById("result-sub");
+
+  if (pct === 100) {
+    iconWrap.className = "result-icon-wrap perfect";
+    iconEl.textContent = "emoji_events";
+    title.textContent = "สมบูรณ์แบบ!";
+    sub.textContent = "คุณตอบถูกทุกข้อ ยอดเยี่ยมมาก!";
+  } else if (pct >= 70) {
+    iconWrap.className = "result-icon-wrap great";
+    iconEl.textContent = "thumb_up";
+    title.textContent = "ทำได้ดีมาก!";
+    sub.textContent = `คุณทำได้ ${pct}% ยังคงปรับปรุงได้อีก`;
+  } else if (pct >= 40) {
+    iconWrap.className = "result-icon-wrap good";
+    iconEl.textContent = "school";
+    title.textContent = "พอใช้ได้";
+    sub.textContent = `คุณทำได้ ${pct}% ลองฝึกอีกครั้ง`;
+  } else {
+    iconWrap.className = "result-icon-wrap poor";
+    iconEl.textContent = "replay";
+    title.textContent = "ยังต้องฝึกอีก";
+    sub.textContent = `คุณทำได้ ${pct}% ลองทบทวนตารางธาตุก่อน`;
+  }
+  document.getElementById("result-overlay").classList.add("open");
+}
+
+function restartQuiz() {
+  document.getElementById("result-overlay").classList.remove("open");
+  startQuiz();
+}
+
+function exitToTable() {
+  clearTimer();
+  document.getElementById("result-overlay").classList.remove("open");
+  document.getElementById("quiz-screen").classList.remove("active");
+}
+
+function confirmExit() {
+  exitToTable();
+}
+
+function submitText() {} // placeholder — text mode not used in MCQ
+
+// Enter key for text input
+document.getElementById("q-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") submitText();
+});
+
+// Service Worker Registration untuk PWA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(() => {
+    console.log('Service Worker registered');
+  }).catch((err) => {
+    console.log('Service Worker registration failed:', err);
+  });
+}
+</script>
+</body>
+</html>

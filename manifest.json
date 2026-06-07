@@ -1,0 +1,59 @@
+{
+  "name": "Periodic table Best Icon app",
+  "short_name": "Periodic Table",
+  "description": "แอปตารางธาตุแบบโปรแกรมสำหรับเรียนรู้ธาตุและการทดสอบความรู้",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "scope": "./",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "MyIcon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "MyIcon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "MyIcon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "MyIcon.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    },
+    {
+      "src": "MyIcon.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "ทดสอบความรู้",
+      "short_name": "ทดสอบ",
+      "description": "เข้าสู่โหมดทดสอบแบบด่วน",
+      "url": "./index.html",
+      "icons": [
+        {
+          "src": "MyIcon.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
