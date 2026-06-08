@@ -122,6 +122,16 @@ class DragDropQuiz {
 // Global instance
 let dragDropQuiz = new DragDropQuiz();
 
+// Open drag-drop quiz mode
+function openDragDropMode(group = 'all') {
+  document.getElementById('quiz-screen').classList.remove('active');
+  document.getElementById('dragdrop-screen').classList.add('active');
+  
+  dragDropQuiz = new DragDropQuiz();
+  dragDropQuiz.init(group);
+  renderDragDropQuiz();
+}
+
 // Drag and Drop Event Handlers
 function setupDragDrop() {
   // Make all draggable cards draggable
@@ -132,47 +142,52 @@ function setupDragDrop() {
 
 function setupCardDragging() {
   document.addEventListener('dragstart', (e) => {
-    if (e.target.classList.contains('dragdrop-card')) {
-      const elementData = JSON.parse(e.target.dataset.element);
+    if (e.target.closest('.dragdrop-card')) {
+      const card = e.target.closest('.dragdrop-card');
+      const elementData = JSON.parse(card.dataset.element);
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('application/json', JSON.stringify(elementData));
-      e.target.classList.add('dragging');
+      card.classList.add('dragging');
     }
   });
 
   document.addEventListener('dragend', (e) => {
-    if (e.target.classList.contains('dragdrop-card')) {
-      e.target.classList.remove('dragging');
+    const card = e.target.closest('.dragdrop-card');
+    if (card) {
+      card.classList.remove('dragging');
     }
   });
 }
 
 function setupDropZones() {
   document.addEventListener('dragover', (e) => {
-    if (e.target.classList.contains('drop-slot')) {
+    if (e.target.closest('.drop-slot')) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
-      e.target.classList.add('drag-over');
+      e.target.closest('.drop-slot').classList.add('drag-over');
     }
   });
 
   document.addEventListener('dragleave', (e) => {
-    if (e.target.classList.contains('drop-slot')) {
-      e.target.classList.remove('drag-over');
+    const slot = e.target.closest('.drop-slot');
+    if (slot && e.target === slot) {
+      slot.classList.remove('drag-over');
     }
   });
 
   document.addEventListener('drop', (e) => {
-    if (e.target.classList.contains('drop-slot')) {
+    const slot = e.target.closest('.drop-slot');
+    if (slot) {
       e.preventDefault();
-      e.target.classList.remove('drag-over');
+      e.stopPropagation();
+      slot.classList.remove('drag-over');
       
       try {
         const elementData = JSON.parse(e.dataTransfer.getData('application/json'));
-        const groupNum = parseInt(e.target.dataset.group);
-        const periodNum = parseInt(e.target.dataset.period);
+        const groupNum = parseInt(slot.dataset.group);
+        const periodNum = parseInt(slot.dataset.period);
         
-        handleElementDrop(elementData, groupNum, periodNum, e.target);
+        handleElementDrop(elementData, groupNum, periodNum, slot);
       } catch (error) {
         console.error('Drop error:', error);
       }
@@ -192,20 +207,41 @@ function handleElementDrop(element, groupNum, periodNum, dropElement) {
         <div class="slot-name">${element.name_th}</div>
       </div>
     `;
-    dropElement.draggable = false;
+    dropElement.style.pointerEvents = 'none';
     
     // Remove the card from the deck
-    const card = document.querySelector(`.dragdrop-card[data-element='${JSON.stringify(element)}']`);
-    if (card) card.style.opacity = '0.3';
+    const cards = document.querySelectorAll('.dragdrop-card');
+    cards.forEach(card => {
+      if (card.dataset.element === JSON.stringify(element)) {
+        card.style.opacity = '0.3';
+        card.draggable = false;
+      }
+    });
+    
+    // Update progress
+    updateDragDropProgress();
     
     // Check if all placed
     if (dragDropQuiz.correctCount === dragDropQuiz.totalToPlace) {
-      endDragDropQuiz();
+      setTimeout(endDragDropQuiz, 500);
     }
   } else {
     // Show error animation
     dropElement.classList.add('error');
     setTimeout(() => dropElement.classList.remove('error'), 500);
+  }
+}
+
+function updateDragDropProgress() {
+  const percentage = Math.round((dragDropQuiz.correctCount / dragDropQuiz.totalToPlace) * 100);
+  const progressFill = document.querySelector('.dragdrop-progress-fill');
+  const progressLabel = document.querySelector('.dragdrop-progress-label');
+  
+  if (progressFill) {
+    progressFill.style.width = percentage + '%';
+  }
+  if (progressLabel) {
+    progressLabel.textContent = `${dragDropQuiz.correctCount}/${dragDropQuiz.totalToPlace}`;
   }
 }
 
@@ -222,27 +258,29 @@ function showDragDropResults(results, rating) {
   if (!modal) return;
   
   const content = `
-    <div class="dragdrop-result-header">
-      <div class="result-emoji">${rating.emoji}</div>
-      <h2>${rating.text}</h2>
-    </div>
-    <div class="dragdrop-result-stats">
-      <div class="stat">
-        <div class="stat-number">${results.correct}/${results.total}</div>
-        <div class="stat-label">ถูกต้อง</div>
+    <div class="dragdrop-result-card">
+      <div class="dragdrop-result-header">
+        <div class="result-emoji">${rating.emoji}</div>
+        <h2>${rating.text}</h2>
       </div>
-      <div class="stat">
-        <div class="stat-number">${results.percentage}%</div>
-        <div class="stat-label">เปอร์เซ็นต์</div>
+      <div class="dragdrop-result-stats">
+        <div class="stat">
+          <div class="stat-number">${results.correct}/${results.total}</div>
+          <div class="stat-label">ถูกต้อง</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">${results.percentage}%</div>
+          <div class="stat-label">เปอร์เซ็นต์</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">${results.timeFormatted}</div>
+          <div class="stat-label">เวลา</div>
+        </div>
       </div>
-      <div class="stat">
-        <div class="stat-number">${results.timeFormatted}</div>
-        <div class="stat-label">เวลา</div>
+      <div class="dragdrop-result-actions">
+        <button class="dragdrop-btn-primary" onclick="retryDragDrop()">ลองใหม่</button>
+        <button class="dragdrop-btn-secondary" onclick="exitDragDrop()">กลับหน้าหลัก</button>
       </div>
-    </div>
-    <div class="dragdrop-result-actions">
-      <button class="dragdrop-btn-primary" onclick="retryDragDrop()">ลองใหม่</button>
-      <button class="dragdrop-btn-secondary" onclick="exitDragDrop()">กลับหน้าหลัก</button>
     </div>
   `;
   
@@ -255,15 +293,20 @@ function retryDragDrop() {
   if (modal) modal.classList.remove('open');
   
   // Reset and start new quiz
+  const group = dragDropQuiz.selectedGroup;
   dragDropQuiz = new DragDropQuiz();
-  dragDropQuiz.init(dragDropQuiz.selectedGroup);
+  dragDropQuiz.init(group);
   renderDragDropQuiz();
 }
 
 function exitDragDrop() {
   dragDropQuiz.stopTimer();
   document.getElementById('dragdrop-screen').classList.remove('active');
-  document.getElementById('quiz-screen').classList.add('active');
+  document.getElementById('dragdrop-result').classList.remove('open');
+  // Show table view
+  document.querySelector('header').style.display = 'flex';
+  document.querySelector('.legend').style.display = 'flex';
+  document.querySelector('.main').style.display = 'block';
 }
 
 function renderDragDropQuiz() {
@@ -280,11 +323,20 @@ function renderDragDropQuiz() {
     `)
     .join('');
   
-  document.getElementById('dragdrop-deck').innerHTML = deckHTML;
+  const deckContainer = document.getElementById('dragdrop-deck');
+  if (deckContainer) {
+    deckContainer.innerHTML = deckHTML;
+  }
   
   // Render periodic table grid
   const gridHTML = generatePeriodicTableSlots();
-  document.getElementById('dragdrop-table').innerHTML = gridHTML;
+  const tableContainer = document.getElementById('dragdrop-table');
+  if (tableContainer) {
+    tableContainer.innerHTML = gridHTML;
+  }
+  
+  // Update progress
+  updateDragDropProgress();
   
   setupDragDrop();
 }
@@ -297,7 +349,7 @@ function generatePeriodicTableSlots() {
     for (let group = 1; group <= 18; group++) {
       html += `
         <div class="drop-slot" data-group="${group}" data-period="${period}">
-          <div class="slot-label">族 ${group}<br/>周期 ${period}</div>
+          <div class="slot-label">G${group}</div>
         </div>
       `;
     }

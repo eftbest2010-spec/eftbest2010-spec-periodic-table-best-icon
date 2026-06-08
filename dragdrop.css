@@ -40,6 +40,7 @@
   border-radius: 8px;
   transition: all 0.15s;
   white-space: nowrap;
+  min-height: 44px;
 }
 
 .dragdrop-back-btn:hover {
@@ -47,7 +48,11 @@
   color: #cbd5e1;
 }
 
-.dragdrop-timer {
+.dragdrop-back-btn .material-icons-round {
+  font-size: 18px;
+}
+
+#dragdrop-timer {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -58,9 +63,10 @@
   font-weight: 700;
   font-family: monospace;
   font-size: 1.1rem;
+  white-space: nowrap;
 }
 
-.dragdrop-timer .material-icons-round {
+#dragdrop-timer .material-icons-round {
   font-size: 20px;
   color: #ef4444;
 }
@@ -70,19 +76,22 @@
   align-items: center;
   gap: 10px;
   flex: 1;
+  min-width: 150px;
 }
 
 .dragdrop-progress-label {
   font-size: 0.8rem;
   color: #94a3b8;
+  white-space: nowrap;
 }
 
 .dragdrop-progress-bar {
-  width: 150px;
+  flex: 1;
   height: 6px;
   background: #334155;
   border-radius: 999px;
   overflow: hidden;
+  min-width: 100px;
 }
 
 .dragdrop-progress-fill {
@@ -90,6 +99,7 @@
   background: linear-gradient(90deg, #3b82f6, #6366f1);
   border-radius: 999px;
   transition: width 0.3s ease;
+  width: 0%;
 }
 
 /* Main Content */
@@ -385,6 +395,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
+  min-height: 44px;
 }
 
 .dragdrop-btn-primary {
@@ -420,6 +431,7 @@
     flex-direction: row;
     max-height: 100px;
     overflow-x: auto;
+    overflow-y: hidden;
   }
 
   #dragdrop-deck {
@@ -478,7 +490,7 @@
   }
 
   .dragdrop-back-btn,
-  .dragdrop-timer,
+  #dragdrop-timer,
   .dragdrop-progress {
     width: 100%;
   }
